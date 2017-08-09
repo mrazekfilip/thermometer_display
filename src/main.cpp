@@ -37,9 +37,9 @@ void setup(){
     EncMode encMode = ENC_NONE;
 
     setTemperature = 0; 
-    timer = 20;
+    timer = 0;
     status = STAT_SET_TEMP;
-    unsigned long seconds;
+    unsigned long seconds = -1;
 
 
     while (true){
@@ -57,6 +57,14 @@ void setup(){
             startCook = millis() / 1000;
             Serial.println(startCook);
             seconds = timer;
+        }
+
+        if (encMode == ENC_NONE && status == STAT_DONE
+                && button == ClickEncoder::Clicked
+                && buttonStatus == ClickEncoder::Clicked) {
+            cooking = false;
+            status = STAT_SET_TEMP;
+            seconds = -1;
         }
 
         //set what
@@ -103,7 +111,10 @@ void setup(){
         display.setSetTemp(setTemperature);
 
         //time
-        if (seconds > 0 && cooking){
+        if (seconds == 0){
+            timer = 0;
+        }
+        else if (seconds > 0 && cooking){
             seconds = timer + startCook - millis() / 1000;
             display.setTime(seconds);
         } else {
