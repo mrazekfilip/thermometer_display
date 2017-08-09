@@ -54,4 +54,5 @@ public:
     void setTime(unsigned long seconds);
 
     void update();
+    void refresh();
 };

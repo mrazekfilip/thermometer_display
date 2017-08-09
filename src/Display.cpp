@@ -265,4 +265,13 @@ void Display::update(){
     }
 }
 
+void Display::refresh(){
+    updateTemp = true;
+    updateSetTemp = true;
+    updateStat = true;
+    updateTime = true;
+    updateGraph = true;
+    update();
+}
+
 
