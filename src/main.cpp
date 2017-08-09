@@ -106,6 +106,9 @@ void setup(){
                 timer += encoder.getValue();
                 break;
         }
+        if (timer >= 360000){
+            timer = 0;
+        }
 
         //setTemp
         display.setSetTemp(setTemperature);

@@ -167,9 +167,9 @@ void Display::drawTimerText(int x, int y){
     display.setCursor(x, y);
     display.setTextColor(0xFFFF);
     display.setTextSize(3);
-    int displayHours = seconds / 3600;
-    int displayMinutes = (seconds - displayHours * 3600) / 60;
-    int displaySeconds = seconds - displayHours * 3600 - displayMinutes * 60;
+    unsigned long displayHours = seconds / 3600;
+    unsigned long displayMinutes = (seconds - displayHours * 3600) / 60;
+    unsigned long displaySeconds = seconds - displayHours * 3600 - displayMinutes * 60;
 
     if (displayHours < 10){
         display.print("0");
