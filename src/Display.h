@@ -14,14 +14,14 @@ enum Status{
 
 struct GraphPoint{
     unsigned long time;
-    float temp;
+    double temp;
 };
 
 class Display{
 private:
     TFT_HX8357 display;
-    float temperature;
-    float setTemperature;
+    double temperature;
+    double setTemperature;
     Status status;
     unsigned long seconds;
     RingBufCPP<GraphPoint, 410> tempHist;
@@ -48,8 +48,8 @@ private:
 
 public:
     Display();
-    void setTemp(float temperature);
-    void setSetTemp(float setTemperature);
+    void setTemp(double temperature);
+    void setSetTemp(double setTemperature);
     void setStatus(Status status);
     void setTime(unsigned long seconds);
 

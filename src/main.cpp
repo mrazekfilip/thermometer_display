@@ -1,6 +1,10 @@
 #include "Arduino.h"
+#include <SPI.h>
 #include <ClickEncoder.h>
 #include <TimerOne.h>
+#include <PID_v1.h>
+#include "Adafruit_MAX31855.h"
+
 
 #include "Display.h"
 
@@ -18,31 +22,73 @@ void timerIsr() {
     encoder.service();
 }
 
+
+
 void setup(){
     Serial.begin(9600);
-    Display display;
-    encoder.setAccelerationEnabled(true);
-    encoder.setDoubleClickEnabled(true);
-    Timer1.initialize(1000);
-    Timer1.attachInterrupt(timerIsr);
 
-
-    float temperature;
-    float setTemperature;
+    double temperature;
+    double setTemperature;
     Status status;
     unsigned long timer;
     bool cooking = false;
     unsigned long startCook = 0;
     ClickEncoder::Button button;
     EncMode encMode = ENC_NONE;
+    unsigned long tempTimer;
 
     setTemperature = 0; 
     timer = 0;
     status = STAT_SET_TEMP;
     unsigned long seconds = -1;
 
+    double heatPower = 0;
+    double P = 0, I = 0, D = 0;
+    Display display;
 
+    encoder.setAccelerationEnabled(true);
+    encoder.setDoubleClickEnabled(true);
+    Timer1.initialize(1000);
+    Timer1.attachInterrupt(timerIsr);
+
+    Adafruit_MAX31855 thermometer(6, 7, 5);
+    delay(500);
+    tempTimer = millis();
+
+    PID pid(&temperature, 
+            &heatPower, 
+            &setTemperature, 
+            P, I, D, DIRECT);
+    pid.SetMode(AUTOMATIC);
+    pid.SetOutputLimits(0, 1);
+    
     while (true){
+        //set PID
+        if (Serial.available() > 0){
+            char key = Serial.read();
+            switch(key){
+                case 'q':
+                    P += 0.1;
+                    break;
+                case 'a':
+                    P -= +0.1;
+                    break;
+                case 'w':
+                    I += 0.1;
+                    break;
+                case 's':
+                    I -= 0.1;
+                    break;
+                case 'e':
+                    D += 0.1;
+                    break;
+                case 'd':
+                    D -= 0.1;
+                    break;
+            }
+        }
+        pid.SetTunings(P, I, D);
+
         //read status
         ClickEncoder::Button buttonStatus = encoder.getButton();
         if (buttonStatus != ClickEncoder::Open){
@@ -125,7 +171,24 @@ void setup(){
         }
 
         //temp
-        temperature = 20.5;
+        if (millis() - tempTimer > 1000){
+            tempTimer = millis();
+            temperature = thermometer.readCelsius();
+            pid.Compute();
+
+            Serial.print(temperature);
+            Serial.print(" ");
+            Serial.print(setTemperature);
+            Serial.print(" ");
+            Serial.print(heatPower, 5);
+            Serial.print(" ");
+            Serial.print(P);
+            Serial.print(" ");
+            Serial.print(I);
+            Serial.print(" ");
+            Serial.print(D);
+            Serial.print('\n');
+        }
         display.setTemp(temperature);
 
         //status

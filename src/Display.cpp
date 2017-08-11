@@ -41,7 +41,7 @@ void Display::drawThermometer(int x, int y){
 
 void Display::drawTemperature(int x, int y){
     int color;
-    float slider = temperature;
+    double slider = temperature;
     if (slider > 100){
         slider = 100;
     }
@@ -217,14 +217,14 @@ void Display::drawGraph(int x, int y){
     display.drawFastHLine(x, y + 149 - setTemperature, 410, 0xD33D);
 }
 
-void Display::setTemp(float temperature){
+void Display::setTemp(double temperature){
     if (this->temperature == temperature)
         return;
     this->temperature = temperature;
     updateTemp = true;
 }
 
-void Display::setSetTemp(float setTemperature){
+void Display::setSetTemp(double setTemperature){
     if (this->setTemperature == setTemperature)
         return;
     this->setTemperature = setTemperature;
